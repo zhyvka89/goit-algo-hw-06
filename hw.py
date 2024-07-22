@@ -84,17 +84,33 @@ print(f"{bfs_path}")
 
 ### ЗАВДАННЯ 3 ###
 
-def dijkstra_shortest_path(graph, start, end):
-  try:
-    path = nx.shortest_path(graph, source=start, target=end, weight='weight')
-    length = nx.shortest_path_length(graph, source=start, target=end, weight='weight')
-    return path, length
-  except nx.NetworkXNoPath:
-    return None, float('inf')
+def dijkstra(graph, start):
+  distances = {vertex: float('infinity') for vertex in graph}
+  distances[start] = 0
+  unvisited = list(graph.keys())
 
-# Знаходження найкоротших шляхів між всіма парами вершин
-for start_node in G.nodes():
-  for end_node in G.nodes():
-    if start_node != end_node:
-      path, length = dijkstra_shortest_path(G, start_node, end_node)
-      print(f"Найкоротший шлях від {start_node} до {end_node}: {path} з довжиною {length}")
+  while unvisited:
+    current_vertex = min(unvisited, key=lambda vertex: distances[vertex])
+
+    if distances[current_vertex] == float('infinity'):
+      break
+
+    for neighbor, weight in graph[current_vertex].items():
+      distance = distances[current_vertex] + weight
+
+      if distance < distances[neighbor]:
+        distances[neighbor] = distance
+
+    unvisited.remove(current_vertex)
+  return distances
+
+graph = {
+    'Аліса': {'Микола': 4, 'Юля': 3, 'Олег': 6},
+    'Микола': {'Аліса': 4, 'Олег': 2, 'Юля': 7},
+    'Олег': {'Микола': 2, 'Богдан': 5, 'Аліса': 6},
+    'Богдан': {'Олег': 5, 'Юля': 1},
+    'Юля': {'Богдан': 1, 'Аліса': 3, 'Микола': 7}
+}
+
+# Виклик функції для знаходження найкоротшого шляху від Миколи до інших контактів
+print(dijkstra(graph, 'Микола'))
